@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -37,6 +39,31 @@ class Book
 
     #[ORM\Column(length: 255)]
     private ?string $state = null;
+
+    /**
+     * @var Collection<int, EmpruntLivre>
+     */
+    #[ORM\OneToMany(targetEntity: EmpruntLivre::class, mappedBy: 'book', orphanRemoval: true)]
+    private Collection $empruntLivres;
+
+    /**
+     * @var Collection<int, Commentaires>
+     */
+    #[ORM\OneToMany(targetEntity: Commentaires::class, mappedBy: 'book')]
+    private Collection $commentaires;
+
+    #[ORM\ManyToOne(inversedBy: 'books')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Etat $etat = null;
+
+    #[ORM\ManyToOne(inversedBy: 'books')]
+    private ?Categories $categorie = null;
+
+    public function __construct()
+    {
+        $this->empruntLivres = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -135,6 +162,90 @@ class Book
     public function setState(string $state): static
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EmpruntLivre>
+     */
+    public function getEmpruntLivres(): Collection
+    {
+        return $this->empruntLivres;
+    }
+
+    public function addEmpruntLivre(EmpruntLivre $empruntLivre): static
+    {
+        if (!$this->empruntLivres->contains($empruntLivre)) {
+            $this->empruntLivres->add($empruntLivre);
+            $empruntLivre->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmpruntLivre(EmpruntLivre $empruntLivre): static
+    {
+        if ($this->empruntLivres->removeElement($empruntLivre)) {
+            // set the owning side to null (unless already changed)
+            if ($empruntLivre->getBook() === $this) {
+                $empruntLivre->setBook(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentaires>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaires $commentaire): static
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaires $commentaire): static
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            // set the owning side to null (unless already changed)
+            if ($commentaire->getBook() === $this) {
+                $commentaire->setBook(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getEtat(): ?Etat
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(?Etat $etat): static
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getCategorie(): ?Categories
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?Categories $categorie): static
+    {
+        $this->categorie = $categorie;
 
         return $this;
     }

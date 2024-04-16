@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UsersRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -52,6 +54,31 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?int $phoneNumber = null;
+
+    /**
+     * @var Collection<int, Reservation>
+     */
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'User', orphanRemoval: true)]
+    private Collection $reservations;
+
+    /**
+     * @var Collection<int, EmpruntLivre>
+     */
+    #[ORM\OneToMany(targetEntity: EmpruntLivre::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $empruntLivres;
+
+    /**
+     * @var Collection<int, Commentaires>
+     */
+    #[ORM\OneToMany(targetEntity: Commentaires::class, mappedBy: 'comUser')]
+    private Collection $commentaires;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+        $this->empruntLivres = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -208,6 +235,96 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhoneNumber(int $phoneNumber): static
     {
         $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): static
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): static
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getUser() === $this) {
+                $reservation->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EmpruntLivre>
+     */
+    public function getEmpruntLivres(): Collection
+    {
+        return $this->empruntLivres;
+    }
+
+    public function addEmpruntLivre(EmpruntLivre $empruntLivre): static
+    {
+        if (!$this->empruntLivres->contains($empruntLivre)) {
+            $this->empruntLivres->add($empruntLivre);
+            $empruntLivre->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmpruntLivre(EmpruntLivre $empruntLivre): static
+    {
+        if ($this->empruntLivres->removeElement($empruntLivre)) {
+            // set the owning side to null (unless already changed)
+            if ($empruntLivre->getUser() === $this) {
+                $empruntLivre->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentaires>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaires $commentaire): static
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setComUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaires $commentaire): static
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            // set the owning side to null (unless already changed)
+            if ($commentaire->getComUser() === $this) {
+                $commentaire->setComUser(null);
+            }
+        }
 
         return $this;
     }

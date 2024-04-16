@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\RoomRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -20,14 +22,23 @@ class Room
     #[ORM\Column]
     private ?int $capability = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $equipments = null;
+    /**
+     * @var Collection<int, Reservation>
+     */
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'room', orphanRemoval: true)]
+    private Collection $reservations;
 
-    #[ORM\Column]
-    private ?bool $disponibility = null;
+    /**
+     * @var Collection<int, Equipements>
+     */
+    #[ORM\ManyToMany(targetEntity: Equipements::class, inversedBy: 'rooms')]
+    private Collection $equipement;
 
-    #[ORM\Column]
-    private ?\DateInterval $reservation_duration = null;
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+        $this->equipement = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -58,39 +69,59 @@ class Room
         return $this;
     }
 
-    public function getEquipments(): ?string
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
     {
-        return $this->equipments;
+        return $this->reservations;
     }
 
-    public function setEquipments(string $equipments): static
+    public function addReservation(Reservation $reservation): static
     {
-        $this->equipments = $equipments;
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setRoom($this);
+        }
 
         return $this;
     }
 
-    public function isDisponibility(): ?bool
+    public function removeReservation(Reservation $reservation): static
     {
-        return $this->disponibility;
-    }
-
-    public function setDisponibility(bool $disponibility): static
-    {
-        $this->disponibility = $disponibility;
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getRoom() === $this) {
+                $reservation->setRoom(null);
+            }
+        }
 
         return $this;
     }
 
-    public function getReservationDuration(): ?\DateInterval
+    /**
+     * @return Collection<int, Equipements>
+     */
+    public function getEquipement(): Collection
     {
-        return $this->reservation_duration;
+        return $this->equipement;
     }
 
-    public function setReservationDuration(\DateInterval $reservation_duration): static
+    public function addEquipement(Equipements $equipement): static
     {
-        $this->reservation_duration = $reservation_duration;
+        if (!$this->equipement->contains($equipement)) {
+            $this->equipement->add($equipement);
+        }
 
         return $this;
     }
+
+    public function removeEquipement(Equipements $equipement): static
+    {
+        $this->equipement->removeElement($equipement);
+
+        return $this;
+    }
+
+    
 }
