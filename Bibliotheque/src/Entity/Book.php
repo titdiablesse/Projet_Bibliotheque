@@ -167,6 +167,26 @@ class Book
     }
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private ?string $condition;
+
+    public function getCondition(): ?string
+    {
+        return $this->condition;
+    }
+
+    public function setCondition(?string $condition): self
+    {
+        $this->condition = $condition;
+
+        return $this;
+    }
+
+
+
+
+    /**
      * @return Collection<int, EmpruntLivre>
      */
     public function getEmpruntLivres(): Collection
