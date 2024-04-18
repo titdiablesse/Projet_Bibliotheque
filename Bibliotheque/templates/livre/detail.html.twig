@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Bienvenu dans notre bibliotheque{% endblock %}
 
 {% block body %}
 <style>
@@ -8,8 +8,14 @@
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
 
-<h1>{{ book.title }}</h1>
 <h2>{{ book.id }}</h2>
+<h1>{{ book.title }}</h1>
+<h2>{{ book.image }}</h2>
+<h2>{{ book.resume }}</h2>
+<h2>{{ book.author }}</h2>
+<h2>{{ book.year }}</h2>
+<h2>{{ book.state }}</h2>
+
 
 
 {% endblock %}
