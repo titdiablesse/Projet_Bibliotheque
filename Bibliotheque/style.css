@@ -1,0 +1,4 @@
+.book-image {
+    width: 150px; /* Largeur souhaitée */
+    height: auto; /* Hauteur automatique pour maintenir les proportions */
+}

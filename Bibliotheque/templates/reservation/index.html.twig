@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendrier!{% endblock %}
+
+{% block body %}
+ <div id="calendrier">
+ </div>
+{% block javascripts %}
+    <script>
+    window.onload = function() {
+        let calendarElt = document.getElementById('calendrier');
+        let calendar = new FullCalendar.Calendar(calendarElt, {
+             initialView: 'timeGridWeek',
+             locale: 'fr',
+             timeZone:'Europe,Paris',
+             headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                
+             }
+
+
+        });
+         calendar.render();
+    }
+    
+    </script>
+    {% endblock %}
+{% endblock %}
