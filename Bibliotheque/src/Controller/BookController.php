@@ -2,21 +2,22 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\BookRepository;
+use App\Entity\Book; 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Book; // Importe l'entité Book
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BookController extends AbstractController
 {
-    /**
-     * @Route("/livres", name="liste_livres")
-     */
-    public function index(): Response
+   
+    #[Route('/book', name: 'app_book')]
+   
+    public function index(BookRepository $bookRepository, Request $request ): Response
     {
         // Récupère le référentiel de l'entité Book
-        $bookRepository = $this->getDoctrine()->getRepository(Book::class);
+      
         
         // Récupère la liste des livres depuis la base de données
         $livres = $bookRepository->findAll();
@@ -30,23 +31,23 @@ class BookController extends AbstractController
     /**
      * @Route("/livres/{id}", name="detail_livre")
      */
-    public function show(int $id): Response
+    public function show(int $id, BookRepository $bookRepository ): Response
     {
         // Récupère le référentiel de l'entité Book
-        $bookRepository = $this->getDoctrine()->getRepository(Book::class);
+     
         
         // Récupère les détails du livre spécifié par son ID
         $livre = $bookRepository->find($id);
         
         // Vérifie si le livre existe
-        if (!$livre) {
-            throw $this->createNotFoundException('Livre non trouvé');
-        }
+       // if (!$livre) {
+        //    throw $this->createNotFoundException('Livre non trouvé');
+    
         
         // Rend la vue Twig en passant les détails du livre
-        return $this->render('livre/detail.html.twig', [
-            'livre' => $livre,
-        ]);
+       return $this->render('livre/detail.html.twig', [
+           'livre' => $livre,
+       ]);
     }
 
     // Ajouter d'autres méthodes pour ajouter, modifier et supprimer des livres si nécessaire
