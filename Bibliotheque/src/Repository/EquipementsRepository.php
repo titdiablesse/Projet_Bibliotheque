@@ -19,7 +19,12 @@ class EquipementsRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Equipements::class);
+
     }
+    public function getEquipements(){
+        return $this->findAll();
+    }
+
 
     //    /**
     //     * @return Equipements[] Returns an array of Equipements objects
