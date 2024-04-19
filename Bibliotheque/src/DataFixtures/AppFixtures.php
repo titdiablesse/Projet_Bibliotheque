@@ -5,7 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Users;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Faker\Factory; // Ajout de l'import pour la classe Factory
+use Faker\Factory; 
 use Faker\Generator;
 
 class AppFixtures extends Fixture
@@ -33,6 +33,5 @@ class AppFixtures extends Fixture
                 
             $manager->persist($user);
         }
-    }
 
 }
