@@ -4,6 +4,13 @@
 {% block title %}Liste des livres{% endblock %}
 
 {% block body %}
+    {% if app.flashes('succes') is not empty %}
+        <div class="alert alert-success">
+            {% for message in app.flashes('succes') %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
     <h1>Liste des livres</h1>
     <ul>
         {% for book in livres %}
@@ -17,4 +24,5 @@
     </ul>
 
 </div>
+
 {% endblock %}
