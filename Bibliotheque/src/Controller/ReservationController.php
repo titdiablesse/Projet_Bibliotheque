@@ -11,14 +11,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ReservationController extends AbstractController
 {
-    #[Route('/reservation/{id}', name: 'app_reservation')]
-    public function index(ReservationRepository $ReservationRepository, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/reservation/{id}', name: 'app_reservation', methods:['GET'])]
+    public function index($id,ReservationRepository $reservationRepository, Request $request, EntityManagerInterface $entityManager, RoomRepository $roomRepository): Response
     {
-        $events = $ReservationRepository->findAll();
+        $events = $reservationRepository->findAll();
+        $room = $roomRepository->find($id);
+        $events = $reservationRepository->findBy(['room' => $room]); // Filtrer les réservations par salle
         $rdvs = [];
         foreach($events as $event){
             $rdvs[] = [
@@ -35,21 +38,27 @@ class ReservationController extends AbstractController
 
         $data = json_encode($rdvs);
 
-        return $this->render('reservation/index.html.twig', compact('data'));
+        return $this->render('reservation/index.html.twig', [
+            'data' => $data,
+            'id'=> $id,
+        ] );
        
     }
 
-    #[Route('/save-event', name: 'save_event', methods: ['POST'])]
-    public function saveEvent(Request $request, EntityManagerInterface $entityManager, Security $security, UsersRepository $userRepository, RoomRepository $room): Response
+    #[Route('/save-event/{id}', name: 'save_event', methods: ['POST'])]
+    public function saveEvent($id, Request $request, EntityManagerInterface $entityManager, Security $security, UsersRepository $userRepository, RoomRepository $room, UserInterface $user): Response
     { 
         $eventData = $request->request->get('event-data');
         $event = json_decode($eventData, true);
        
-        
-        $roomId = 1;
-        $room = $room->find($roomId);
-        $userId = 1;
-        $user = $userRepository->find($userId);
+        $user = $this->getUser();
+
+        if ($user instanceof UserInterface) {
+            $userId = $user->getId();
+            
+        } 
+
+        $room = $room->find($id);
         
         $reservation = new Reservation();
         $reservation->setUser($user);
@@ -62,7 +71,7 @@ class ReservationController extends AbstractController
         $entityManager->flush();
     
         // rediriger ou renvoyer une réponse appropriée
-        return $this->redirectToRoute('app_reservation',['id' => $reservation->getId()]);
+        return $this->redirectToRoute('app_reservation',['id' => $room->getId()]);
 
     
 }

@@ -5,7 +5,7 @@
 {% block body %}
  <div id="calendrier">
  </div>
- <form id="event-form" method="post" action="{{ path('save_event') }}">
+ <form id="event-form" method="post" action="{{ path('save_event', {id:id}) }}">
     <input type="hidden" id="event-data" name="event-data" value="">
    
 </form>
@@ -24,11 +24,7 @@
     weekends: false,
     slotDuration: '01:00:00',
     themeSystem: 'bootstrap5',
-   
-    
-
     height: 400,
-
     headerToolbar: {
      
       
@@ -59,11 +55,6 @@
        
         
     // }
-
-
-  
-    
-
  
   });
 
@@ -83,21 +74,10 @@
                 // Ajoutez d'autres propriétés si nécessaire
             };
           
-          
-            
-          
-
             eventDataInput.value = JSON.stringify(event);
             eventForm.submit();
            
         }
-    
-
-
-
-       
-            
-
     });
 
 
